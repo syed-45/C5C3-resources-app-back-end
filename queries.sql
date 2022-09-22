@@ -25,4 +25,48 @@ CREATE TABLE build_weeks(
 INSERT INTO recommendations VALUES
 ('I recommend this resource after having used it'),
 ('I do not recommend this resource, having used it'),
-('I have not used this resource but it looks promising')
+('I have not used this resource but it looks promising');
+
+CREATE TABLE resources (
+  resource_id SERIAL PRIMARY KEY,
+  submitter integer REFERENCES users(user_id),
+  title text,
+  author text,
+  url text,
+  time_stamp timestamp default NOW(),
+  summary text,
+  recommendation_option text references recommendations(recommendation_option),
+  recommendation_text text
+  );
+  
+CREATE TABLE tag_resource (
+  tag_name text references tags(tag_name),
+  resource_id integer references resources(resource_id),
+  PRIMARY KEY(tag_name, resource_id)
+  );
+  
+  CREATE TABLE buildweek_resource (
+    buildweek_id text references build_weeks(build_week_name),
+    resource_id integer references resources(resource_id),
+    PRIMARY KEY (buildweek_id, resource_id)
+  );
+  
+  CREATE TABLE comment_inputs (
+    comment_id SERIAL PRIMARY KEY,
+    user_id integer references users(user_id),
+    message text,
+    time_stamp timestamp default NOW()
+   );
+   
+   CREATE TABLE favourites (
+     user_id integer references users(user_id),
+     resource_id integer references resources(resource_id),
+     PRIMARY KEY (user_id, resource_id)
+     );     
+     
+  CREATE TABLE likes (
+    user_id integer references users(user_id),
+    resource_id integer references resources(resource_id),
+    preferences text,
+    PRIMARY KEY (user_id, resource_id)
+   );
