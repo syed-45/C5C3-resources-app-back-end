@@ -3,29 +3,21 @@ CREATE TABLE users(
 	user_id serial primary key,
  	user_name text,
   	is_faculty boolean
-)
-
+);
 -- create tags table
 CREATE TABLE tags (
   tag_name text primary key
-  )
+  );
+
 -- create build_weeks table
-CREATE TABLE build_weeks(
+CREATE TABLE buildweeks(
    build_week_name text primary key
-   )
--- adding weeks into build_weeks table 
- INSERT INTO  build_weeks VALUES
- ('WEEK-1'), ('WEEK2'), ('WEEK-3'),('WEEK-4'), ('WEEK-5'), ('WEEK-6'), ('WEEK-7'), ('WEEK-8')
+   );
 
  -- create recommendations table
   CREATE TABLE recommendations (
-    recommendation_option text primary key)
-    
--- adding recs into recommendations table
-INSERT INTO recommendations VALUES
-('I recommend this resource after having used it'),
-('I do not recommend this resource, having used it'),
-('I have not used this resource but it looks promising');
+    recommendation_option text primary key);
+
 
 CREATE TABLE resources (
   resource_id SERIAL PRIMARY KEY,
@@ -46,7 +38,7 @@ CREATE TABLE tag_resource (
   );
   
   CREATE TABLE buildweek_resource (
-    buildweek_id text references build_weeks(build_week_name),
+    buildweek_id text references buildweeks(build_week_name),
     resource_id integer references resources(resource_id),
     PRIMARY KEY (buildweek_id, resource_id)
   );
@@ -70,3 +62,15 @@ CREATE TABLE tag_resource (
     preferences text,
     PRIMARY KEY (user_id, resource_id)
    );
+
+     CREATE TABLE contenttypes (
+    content_type text primary key
+    );
+    
+    CREATE TABLE content_types_resource (
+      content_type text references contenttypes(content_type),
+      resource_id integer references resources(resource_id),
+      PRIMARY KEY (content_type, resource_id)
+    );
+      
+    

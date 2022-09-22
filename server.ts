@@ -26,9 +26,24 @@ app.use(cors()) //add CORS support to each following route handler
 const client = new Client(dbConfig);
 client.connect();
 
-app.get("/", async (req, res) => {
-  const dbres = await client.query('select * from categories');
-  res.json(dbres.rows);
+
+//GET all data from selected static table
+app.get("/tablename/:name", async (req, res) => {
+  try {    
+    const acceptedTableNames = ['buildweeks','contenttypes','users','tags','recommendations']    
+    const tableName = req.params.name
+    if (!acceptedTableNames.includes(tableName)) {
+      res.status(500).send('table does not exist')
+    }    
+    else {
+      const tableContent = await client.query(`SELECT * FROM ${tableName}`);
+      res.json(tableContent.rows);
+    }
+  } 
+  catch(error) {
+    res.status(500).send('error')
+    console.error(error)
+  }
 });
 
 
