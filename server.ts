@@ -26,9 +26,15 @@ app.use(cors()) //add CORS support to each following route handler
 const client = new Client(dbConfig);
 client.connect();
 
-app.get("/", async (req, res) => {
-  const dbres = await client.query('select * from categories');
-  res.json(dbres.rows);
+app.get("/buildweek", async (req, res) => {
+  try {
+    const dbres = await client.query('select * from build_weeks');
+    res.json(dbres.rows);
+  } 
+  catch(error) {
+    res.status(500).send('Error')
+    console.error(error)
+  }
 });
 
 
