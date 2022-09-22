@@ -15,11 +15,11 @@ CREATE TABLE build_weeks(
    )
 -- adding weeks into build_weeks table 
  INSERT INTO  build_weeks VALUES
- ('WEEK-1')('WEEK2'), ('WEEK-3'),('WEEK-4'), ('WEEK-5'), ('WEEK-6'), ('WEEK-7'), ('WEEK-8')
+ ('WEEK-1'), ('WEEK2'), ('WEEK-3'),('WEEK-4'), ('WEEK-5'), ('WEEK-6'), ('WEEK-7'), ('WEEK-8')
 
  -- create recommendations table
   CREATE TABLE recommendations (
-    frecommendation_option text primary key)
+    recommendation_option text primary key)
     
 -- adding recs into recommendations table
 INSERT INTO recommendations VALUES
