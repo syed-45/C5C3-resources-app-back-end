@@ -46,6 +46,20 @@ app.get("/tablename/:name", async (req, res) => {
   }
 });
 
+app.post("/resources", async (req, res) => {
+  try {    
+    const resourceData = req.body
+    const col_names = 'submitter,title,author,url,summary,recommendation_option,recommendation_text' 
+    const values = [resourceData.submitter, resourceData.title, resourceData.author, resourceData.url, resourceData.summary, resourceData.recommendation_option, resourceData.recommendation_text]
+    const insertResponse =  await client.query(`INSERT into  resources(${col_names}) VALUES($1,$2,$3,$4,$5,$6,$7) returning *`,values)
+    res.json(insertResponse.rows)
+  } 
+  catch(error) {
+    res.status(500).send('error')
+    console.error(error)
+  }
+});
+
 
 //Start the server on the given port
 const port = process.env.PORT;
