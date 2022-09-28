@@ -38,9 +38,9 @@ CREATE TABLE tag_resource (
   );
   
   CREATE TABLE buildweek_resource (
-    buildweek_id text references buildweeks(build_week_name),
+    build_week_name text references buildweeks(build_week_name),
     resource_id integer references resources(resource_id),
-    PRIMARY KEY (buildweek_id, resource_id)
+    PRIMARY KEY (build_week_name, resource_id)
   );
   
   CREATE TABLE comment_inputs (
