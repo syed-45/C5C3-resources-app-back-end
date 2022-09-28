@@ -58,8 +58,8 @@ app.get("/resources", async (req,res)=>{
 
 app.get("/resources/comments/:resourceid", async (req, res)=>{
   try{
-    const {resourceId}= req.params;
-    const getComments = await client.query('select * from comment_inputs where resource_id=$1',[resourceId])
+    const {resourceid}= req.params;
+    const getComments = await client.query('select * from comment_inputs where resource_id=$1',[resourceid])
     res.json(getComments.rows)
   }
   catch(error){
@@ -81,7 +81,20 @@ app.post("/resources", async (req, res) => {
     console.error(error)
   }
 });
-
+app.post("/resources/comments/:resourceid", async (req,res)=>{
+  try{
+    const {resourceid}= req.params;
+    const {user_id, message}= req.body
+    const text = 'INSERT into comment_inputs(user_id, message, resource_id) VALUES($1, $2, $3) returning *'
+    const values= [user_id, message, resourceid]
+    const postComment= await client.query(text, values)
+    res.json(postComment.rows)
+  }
+  catch(error) {
+    res.status(500).send('error')
+    console.error(error)
+  }
+})
 
 //Start the server on the given port
 const port = process.env.PORT;
