@@ -45,6 +45,28 @@ app.get("/tablename/:name", async (req, res) => {
     console.error(error)
   }
 });
+app.get("/resources", async (req,res)=>{
+  try{
+    const getResources= await client.query('SELECT * from resources');
+    res.json(getResources.rows)
+  }
+  catch(error){
+    res.status(500).send("Error");
+    console.log(error)
+  }
+}); 
+
+app.get("/resources/comments/:resourceid", async (req, res)=>{
+  try{
+    const {resourceId}= req.params;
+    const getComments = await client.query('select * from comment_inputs where resource_id=$1',[resourceId])
+    res.json(getComments.rows)
+  }
+  catch(error){
+    res.status(500).send("Error");
+    console.log(error)
+  }
+})
 
 app.post("/resources", async (req, res) => {
   try {    
