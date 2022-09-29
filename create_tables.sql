@@ -48,6 +48,7 @@ CREATE TABLE tag_resource (
     user_id integer references users(user_id),
     message text,
     time_stamp timestamp default NOW()
+    resource_id integer references resources(resource_id),
    );
    
    CREATE TABLE favourites (
