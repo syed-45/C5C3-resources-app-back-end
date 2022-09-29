@@ -50,15 +50,65 @@ app.post("/resources", async (req, res) => {
   try {    
     const resourceData = req.body
     const col_names = 'submitter,title,author,url,summary,recommendation_option,recommendation_text' 
-    const values = [resourceData.submitter, resourceData.title, resourceData.author, resourceData.url, resourceData.summary, resourceData.recommendation_option, resourceData.recommendation_text]
-    const insertResponse =  await client.query(`INSERT into  resources(${col_names}) VALUES($1,$2,$3,$4,$5,$6,$7) returning *`,values)
-    res.json(insertResponse.rows)
+    const values = [resourceData.submitter, resourceData.title, resourceData.author, resourceData.URL, resourceData.summary, resourceData.reccomendationOptions, resourceData.reccomendationText]
+    const insertResponse =  await client.query(`INSERT into resources(${col_names}) VALUES($1,$2,$3,$4,$5,$6,$7) returning *`,values)
+    let resp  = {};
+    insertResponse.rows.map(item => {
+      resp = {
+        resourceID: item.resource_id,
+        submitter: item.submitter,
+        title: item.title,
+        author: item.author,
+        URL: item.url,
+        timestamp: item.time_stamp,
+        summary: item.summary,
+        reccomendationText: item.reccomendation_text,
+        reccomendationOptions: item.reccomendation_options,
+      }
+    })
+    res.status(200).json(resp)
   } 
   catch(error) {
     res.status(500).send('error')
     console.error(error)
   }
 });
+
+app.post("/tablename/:name", async(req, res)=>{
+  try {    
+    const acceptedTableNames = ['buildweek_resource','content_types_resource','tag_resource']    
+    const tablesData = req.body
+    const tableName = req.params.name   
+    if (tableName === "buildweek_resource"){
+      console.log(tablesData)
+      const insertResponse = await client.query(`INSERT INTO ${tableName} VALUES ($1, $2)`, [tablesData.build_week_name, tablesData.resource_id]);
+      res.status(200).json(insertResponse.rows);
+    }
+    else if (tableName === "content_types_resource"){
+      const insertResponse = await client.query(`INSERT INTO ${tableName} VALUES ($1, $2)`, [tablesData.content_type, tablesData.resource_id]);
+      res.status(200).json(insertResponse.rows);
+    }
+    else if (tableName === "tag_resource"){
+      const tagNames = tablesData.tag_name
+      for (let tag of tagNames) {
+        const insertResponse = await client.query(`INSERT INTO ${tableName} VALUES ($1, $2)`, [tag, tablesData.resource_id]);
+      } 
+      res.status(200).json("Success");
+    }
+    else {
+        res.status(500).send('table does not exist')
+    }
+  } 
+  catch(error) {
+    res.status(500).send('error')
+    console.error(error)
+  }
+});
+
+
+
+
+
 
 
 //Start the server on the given port
