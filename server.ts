@@ -47,7 +47,7 @@ app.get("/tablename/:name", async (req, res) => {
 });
 app.get("/resources", async (req,res)=>{
   try{
-    const getResources= await client.query('SELECT * from resources');
+    const getResources= await client.query('SELECT * from resources ORDER BY time_stamp DESC');
     res.json(getResources.rows)
   }
   catch(error){
@@ -141,6 +141,56 @@ app.post("/resources/comments/:resourceid", async (req,res)=>{
   }
 });
 
+app.post("/resources/likes", async (req,res)=>{
+  try{    
+    const likesData = req.body
+    const values = [likesData.user_id, likesData.resource_id, likesData.preferences]
+    const query1 = 'SELECT * FROM likes WHERE user_id = $1 and resource_id=$2 and preferences=$3'
+    const checkIfExists = await client.query(query1, values)
+    const query2 = 'SELECT * FROM likes WHERE user_id = $1 and resource_id=$2'
+    const checkIfExistsAndDiffPreference = await client.query(query2, values.slice(0,2))
+
+    if (checkIfExists.rows.length!==0) {
+      const query3 = 'DELETE FROM likes WHERE user_id=$1 AND resource_id=$2 AND preferences=$3'
+      const deletePreference = await client.query(query3, values)
+      res.status(400).send('deleted preference')
+    } else if (checkIfExistsAndDiffPreference.rows.length!==0) {
+      const query4 = 'UPDATE likes SET preferences=$3 WHERE user_id = $1 and resource_id=$2'
+      const insertNewPreference = await client.query(query4,values);
+      res.status(200).send('updated preference')
+    } else {
+      const query5 = 'INSERT into likes VALUES($1,$2,$3)'
+      const postLikes = await client.query(query5,values)
+      res.status(200).send('success')
+    }    
+  }
+  catch(error) {
+    res.status(500).send('error')
+    console.error(error)
+  }
+});
+
+app.get("/resources/preference/:resource_id/",async (req,res) => {
+  try {    
+    const resource_id = req.params.resource_id    
+
+    const query1 = `SELECT COUNT(*) FROM likes WHERE resource_id =$1 and preferences='like'`
+    const query2 = `SELECT COUNT(*) FROM likes WHERE resource_id =$1 and preferences='dislike'`
+
+    const numOfLikes = await client.query(query1, [resource_id])
+    const numOfDislikes = await client.query(query2, [resource_id])
+
+    const preferencesCount = {
+      likes: numOfLikes.rows[0].count,
+      dislikes: numOfDislikes.rows[0].count
+    }
+    res.status(200).send(preferencesCount)
+
+  } catch (error) {
+    res.status(500).send('error')
+    console.error(error)
+  }
+})
 
 
 //Start the server on the given port
