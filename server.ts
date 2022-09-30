@@ -151,14 +151,16 @@ app.post("/resources/likes", async (req,res)=>{
     const checkIfExistsAndDiffPreference = await client.query(query2, values.slice(0,2))
 
     if (checkIfExists.rows.length!==0) {
-      res.status(400).send('already liked/disliked')
+      const query3 = 'DELETE FROM likes WHERE user_id=$1 AND resource_id=$2 AND preferences=$3'
+      const deletePreference = await client.query(query3, values)
+      res.status(400).send('updated preference')
     } else if (checkIfExistsAndDiffPreference.rows.length!==0) {
-      const query3 = 'UPDATE likes SET preferences=$3 WHERE user_id = $1 and resource_id=$2'
-      const insertNewPreference = await client.query(query3,values);
+      const query4 = 'UPDATE likes SET preferences=$3 WHERE user_id = $1 and resource_id=$2'
+      const insertNewPreference = await client.query(query4,values);
       res.status(200).send('updated preference')
     } else {
-      const query4 = 'INSERT into likes VALUES($1,$2,$3)'
-      const postLikes = await client.query(query4,values)
+      const query5 = 'INSERT into likes VALUES($1,$2,$3)'
+      const postLikes = await client.query(query5,values)
       res.status(200).send('success')
     }
   }
@@ -167,6 +169,15 @@ app.post("/resources/likes", async (req,res)=>{
     console.error(error)
   }
 });
+
+app.get("resources/likes",async (req,res) => {
+  try {
+
+  } catch (error) {
+    res.status(500).send('error')
+    console.error(error)
+  }
+})
 
 
 //Start the server on the given port
