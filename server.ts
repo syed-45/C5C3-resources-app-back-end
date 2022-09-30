@@ -149,7 +149,7 @@ app.post("/resources/comments/:resourceid", async (req,res)=>{
   }
 });
 
-app.post("/resources/likes", async (req,res)=>{
+app.post("/resources/preferences", async (req,res)=>{
   try{    
     const likesData = req.body
     const values = [likesData.user_id, likesData.resource_id, likesData.preferences]
@@ -178,7 +178,7 @@ app.post("/resources/likes", async (req,res)=>{
   }
 });
 
-app.get("/resources/preference/:resource_id/",async (req,res) => {
+app.get("/resources/preference/:resource_id",async (req,res) => {
   try {    
     const resource_id = req.params.resource_id    
 
