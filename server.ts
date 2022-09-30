@@ -71,11 +71,18 @@ app.get("/resources/comments/:resourceid", async (req, res)=>{
 app.post("/resources", async (req, res) => {
   try {    
     const resourceData = req.body
-    const col_names = 'submitter,title,author,url,summary,recommendation_option,recommendation_text' 
+    const col_names = 'submitter,title,author,url,summary,recommendation_option,recommendation_text'
     const values = [resourceData.submitter, resourceData.title, resourceData.author, resourceData.URL, resourceData.summary, resourceData.reccomendationOptions, resourceData.reccomendationText]
-    const insertResponse =  await client.query(`INSERT into resources(${col_names}) VALUES($1,$2,$3,$4,$5,$6,$7) returning *`,values)
-    let resp  = {};
-    insertResponse.rows.map(item => {
+  
+    const checkIfResourceExists = await client.query('SELECT * FROM resources WHERE url = $1',[resourceData.URL])
+  
+    if (checkIfResourceExists.rows.length!==0) {
+      res.status(250).json('already submitted before')
+    }
+    else{
+      const insertResponse =  await client.query(`INSERT into resources(${col_names}) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING *`,values)
+      let resp  = {};
+      insertResponse.rows.map(item => {
       resp = {
         resourceID: item.resource_id,
         submitter: item.submitter,
@@ -89,6 +96,7 @@ app.post("/resources", async (req, res) => {
       }
     })
     res.status(200).json(resp)
+  }
   } 
   catch(error) {
     res.status(500).send('error')
