@@ -47,7 +47,7 @@ app.get("/tablename/:name", async (req, res) => {
 });
 app.get("/resources", async (req,res)=>{
   try{
-    const getResources= await client.query('SELECT * from resources');
+    const getResources= await client.query('SELECT * from resources ORDER BY time_stamp DESC');
     res.json(getResources.rows)
   }
   catch(error){
@@ -185,7 +185,7 @@ app.get("/resources/preference/:resource_id/",async (req,res) => {
       dislikes: numOfDislikes.rows[0].count
     }
     res.status(200).send(preferencesCount)
-    
+
   } catch (error) {
     res.status(500).send('error')
     console.error(error)
