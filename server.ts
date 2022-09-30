@@ -153,7 +153,7 @@ app.post("/resources/likes", async (req,res)=>{
     if (checkIfExists.rows.length!==0) {
       const query3 = 'DELETE FROM likes WHERE user_id=$1 AND resource_id=$2 AND preferences=$3'
       const deletePreference = await client.query(query3, values)
-      res.status(400).send('updated preference')
+      res.status(400).send('deleted preference')
     } else if (checkIfExistsAndDiffPreference.rows.length!==0) {
       const query4 = 'UPDATE likes SET preferences=$3 WHERE user_id = $1 and resource_id=$2'
       const insertNewPreference = await client.query(query4,values);
@@ -162,7 +162,7 @@ app.post("/resources/likes", async (req,res)=>{
       const query5 = 'INSERT into likes VALUES($1,$2,$3)'
       const postLikes = await client.query(query5,values)
       res.status(200).send('success')
-    }
+    }    
   }
   catch(error) {
     res.status(500).send('error')
@@ -170,9 +170,22 @@ app.post("/resources/likes", async (req,res)=>{
   }
 });
 
-app.get("resources/likes",async (req,res) => {
-  try {
+app.get("/resources/preference/:resource_id/",async (req,res) => {
+  try {    
+    const resource_id = req.params.resource_id    
 
+    const query1 = `SELECT COUNT(*) FROM likes WHERE resource_id =$1 and preferences='like'`
+    const query2 = `SELECT COUNT(*) FROM likes WHERE resource_id =$1 and preferences='dislike'`
+
+    const numOfLikes = await client.query(query1, [resource_id])
+    const numOfDislikes = await client.query(query2, [resource_id])
+
+    const preferencesCount = {
+      likes: numOfLikes.rows[0].count,
+      dislikes: numOfDislikes.rows[0].count
+    }
+    res.status(200).send(preferencesCount)
+    
   } catch (error) {
     res.status(500).send('error')
     console.error(error)
