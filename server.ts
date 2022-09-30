@@ -141,6 +141,32 @@ app.post("/resources/comments/:resourceid", async (req,res)=>{
   }
 });
 
+app.post("/resources/likes", async (req,res)=>{
+  try{    
+    const likesData = req.body
+    const values = [likesData.user_id, likesData.resource_id, likesData.preferences]
+    const query1 = 'SELECT * FROM likes WHERE user_id = $1 and resource_id=$2 and preferences=$3'
+    const checkIfExists = await client.query(query1, values)
+    const query2 = 'SELECT * FROM likes WHERE user_id = $1 and resource_id=$2'
+    const checkIfExistsAndDiffPreference = await client.query(query2, values.slice(0,2))
+
+    if (checkIfExists.rows.length!==0) {
+      res.status(400).send('already liked/disliked')
+    } else if (checkIfExistsAndDiffPreference.rows.length!==0) {
+      const query3 = 'UPDATE likes SET preferences=$3 WHERE user_id = $1 and resource_id=$2'
+      const insertNewPreference = await client.query(query3,values);
+      res.status(200).send('updated preference')
+    } else {
+      const query4 = 'INSERT into likes VALUES($1,$2,$3)'
+      const postLikes = await client.query(query4,values)
+      res.status(200).send('success')
+    }
+  }
+  catch(error) {
+    res.status(500).send('error')
+    console.error(error)
+  }
+});
 
 
 //Start the server on the given port
