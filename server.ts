@@ -47,6 +47,7 @@ app.get("/tablename/:name", async (req, res) => {
 });
 app.get("/resources", async (req,res)=>{
   try{
+    // INNER JOIN tags on resource.resource_id = tags.resource_id;
     const getResources= await client.query('SELECT * from resources ORDER BY time_stamp DESC');
     res.json(getResources.rows)
   }
@@ -161,7 +162,7 @@ app.post("/resources/preferences", async (req,res)=>{
     if (checkIfExists.rows.length!==0) {
       const query3 = 'DELETE FROM likes WHERE user_id=$1 AND resource_id=$2 AND preferences=$3'
       const deletePreference = await client.query(query3, values)
-      res.status(400).send('deleted preference')
+      res.status(200).send('deleted preference')
     } else if (checkIfExistsAndDiffPreference.rows.length!==0) {
       const query4 = 'UPDATE likes SET preferences=$3 WHERE user_id = $1 and resource_id=$2'
       const insertNewPreference = await client.query(query4,values);
