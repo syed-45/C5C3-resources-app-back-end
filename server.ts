@@ -179,10 +179,23 @@ app.post("/resources/preferences", async (req,res)=>{
   }
 });
 
+app.delete("/user/:user_id/favourites/:resource_id", async (req, res)=>{
+  try{
+    const {user_id, resource_id}= req.params;
+    const query = 'DELETE FROM favourites WHERE user_id=$1 and resource_id=$2'
+    const deleteFaves = await client.query(query, [user_id, resource_id])
+    res.status(200).send(`${resource_id} has been deleted to user-${user_id} favourites`)
+  }
+  catch (error) {
+    res.status(500).send('error')
+    console.error(error)
+  }
+})
+
 app.post("/user/:user_id/favourites/:resource_id", async (req, res)=>{
   try{
     const {user_id, resource_id}= req.params;
-    const query = 'INSERT INTO favourites VALUES ($1, $2)'
+    const query = 'INSERT INTO favourites VALUES ($1, $2) on conflict (user_id, resource_id) DO NOTHING'
     const insertFaves = await client.query(query, [user_id, resource_id])
     res.status(200).send(`${resource_id} has been added to user-${user_id} favourites`)
   }
