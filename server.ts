@@ -179,6 +179,35 @@ app.post("/resources/preferences", async (req,res)=>{
   }
 });
 
+app.post("/user/:user_id/favourites/:resource_id", async (req, res)=>{
+  try{
+    const {user_id, resource_id}= req.params;
+    const query = 'INSERT INTO favourites VALUES ($1, $2)'
+    const insertFaves = await client.query(query, [user_id, resource_id])
+    res.status(200).send(`${resource_id} has been added to user-${user_id} favourites`)
+  }
+  catch (error) {
+    res.status(500).send('error')
+    console.error(error)
+  }
+})
+app.get("/user/:user_id/favourites/", async (req, res)=>{
+  try{
+    const {user_id}= req.params;
+    const query= `SELECT * 
+    FROM resources
+    LEFT JOIN favourites
+    ON resources.resource_id = favourites.resource_id
+    WHERE favourites.user_id=$1`;
+    const getFaves= await client.query(query, [user_id]);
+    res.status(200).json(getFaves.rows)
+  }
+  catch (error) {
+    res.status(500).send('error')
+    console.error(error)
+  }
+})
+
 app.get("/resources/preference/:resource_id",async (req,res) => {
   try {    
     const resource_id = req.params.resource_id    
