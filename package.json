@@ -7,7 +7,8 @@
     "start": "node dist/server.js",
     "start:dev": "ts-node server.ts",
     "postinstall": "tsc",
-    "dev:server": "LOCAL=true nodemon --watch './**/*.ts' --exec 'ts-node' server.ts"
+    "dev:server": "LOCAL=true nodemon --watch './**/*.ts' --exec 'ts-node' server.ts",
+    "build": "tsc"
   },
   "author": "your name here",
   "license": "ISC",
